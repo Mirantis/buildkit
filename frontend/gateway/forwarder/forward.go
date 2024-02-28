@@ -6,6 +6,7 @@ import (
 
 	cacheutil "github.com/moby/buildkit/cache/util"
 	"github.com/moby/buildkit/client/llb"
+	"github.com/moby/buildkit/executor"
 	"github.com/moby/buildkit/frontend"
 	"github.com/moby/buildkit/frontend/gateway"
 	"github.com/moby/buildkit/frontend/gateway/client"
@@ -25,7 +26,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-func llbBridgeToGatewayClient(ctx context.Context, llbBridge frontend.FrontendLLBBridge, opts map[string]string, inputs map[string]*opspb.Definition, w worker.Infos, sid string, sm *session.Manager) (*bridgeClient, error) {
+func llbBridgeToGatewayClient(ctx context.Context, llbBridge frontend.FrontendLLBBridge, exec executor.Executor, opts map[string]string, inputs map[string]*opspb.Definition, w worker.Infos, sid string, sm *session.Manager) (*bridgeClient, error) {
 	bc := &bridgeClient{
 		opts:              opts,
 		inputs:            inputs,
@@ -35,6 +36,7 @@ func llbBridgeToGatewayClient(ctx context.Context, llbBridge frontend.FrontendLL
 		workers:           w,
 		final:             map[*ref]struct{}{},
 		workerRefByID:     make(map[string]*worker.WorkerRef),
+		executor:          exec,
 	}
 	bc.buildOpts = bc.loadBuildOpts()
 	return bc, nil
@@ -53,6 +55,7 @@ type bridgeClient struct {
 	workerRefByID map[string]*worker.WorkerRef
 	buildOpts     client.BuildOpts
 	ctrs          []client.Container
+	executor      executor.Executor
 }
 
 func (c *bridgeClient) Solve(ctx context.Context, req client.SolveRequest) (*client.Result, error) {
@@ -295,13 +298,13 @@ func (c *bridgeClient) NewContainer(ctx context.Context, req client.NewContainer
 		return nil, err
 	}
 
-	w, err := c.workers.GetDefault()
+	cm, err := c.workers.DefaultCacheManager()
 	if err != nil {
 		return nil, err
 	}
 
 	group := session.NewGroup(c.sid)
-	ctr, err := gateway.NewContainer(ctx, w, c.sm, group, ctrReq)
+	ctr, err := gateway.NewContainer(ctx, cm, c.executor, c.sm, group, ctrReq)
 	if err != nil {
 		return nil, err
 	}

@@ -11,6 +11,7 @@ import (
 	"github.com/moby/buildkit/cache/remotecache"
 	"github.com/moby/buildkit/client"
 	"github.com/moby/buildkit/client/llb"
+	"github.com/moby/buildkit/executor"
 	"github.com/moby/buildkit/exporter/containerimage/exptypes"
 	"github.com/moby/buildkit/frontend"
 	gw "github.com/moby/buildkit/frontend/gateway/client"
@@ -22,6 +23,7 @@ import (
 	"github.com/moby/buildkit/solver/pb"
 	"github.com/moby/buildkit/util/bklog"
 	"github.com/moby/buildkit/util/buildinfo"
+	"github.com/moby/buildkit/util/entitlements"
 	"github.com/moby/buildkit/util/flightcontrol"
 	"github.com/moby/buildkit/util/progress"
 	"github.com/moby/buildkit/worker"
@@ -38,6 +40,10 @@ type llbBridge struct {
 	cms                       map[string]solver.CacheManager
 	cmsMu                     sync.Mutex
 	sm                        *session.Manager
+
+	executorOnce sync.Once
+	executorErr  error
+	executor     executor.Executor
 }
 
 func (b *llbBridge) Warn(ctx context.Context, dgst digest.Digest, msg string, opts frontend.WarnOpts) error {
@@ -135,6 +141,18 @@ func (b *llbBridge) loadResult(ctx context.Context, def *pb.Definition, cacheImp
 	return res, bi, nil
 }
 
+func (b *llbBridge) validateEntitlements(p executor.ProcessInfo) error {
+	ent, err := loadEntitlements(b.builder)
+	if err != nil {
+		return err
+	}
+	v := entitlements.Values{
+		NetworkHost:      p.Meta.NetMode == pb.NetMode_HOST,
+		SecurityInsecure: p.Meta.SecurityMode == pb.SecurityMode_INSECURE,
+	}
+	return ent.Check(v)
+}
+
 func (b *llbBridge) Solve(ctx context.Context, req frontend.SolveRequest, sid string) (res *frontend.Result, err error) {
 	if req.Definition != nil && req.Definition.Def != nil && req.Frontend != "" {
 		return nil, errors.New("cannot solve with both Definition and Frontend specified")
@@ -150,7 +168,7 @@ func (b *llbBridge) Solve(ctx context.Context, req frontend.SolveRequest, sid st
 		if !ok {
 			return nil, errors.Errorf("invalid frontend: %s", req.Frontend)
 		}
-		res, err = f.Solve(ctx, b, req.FrontendOpt, req.FrontendInputs, sid, b.sm)
+		res, err = f.Solve(ctx, b, b, req.FrontendOpt, req.FrontendInputs, sid, b.sm)
 		if err != nil {
 			return nil, err
 		}
@@ -185,6 +203,40 @@ func (b *llbBridge) Solve(ctx context.Context, req frontend.SolveRequest, sid st
 	}
 
 	return
+}
+
+func (b *llbBridge) Run(ctx context.Context, id string, rootfs executor.Mount, mounts []executor.Mount, process executor.ProcessInfo, started chan<- struct{}) error {
+	if err := b.validateEntitlements(process); err != nil {
+		return err
+	}
+
+	if err := b.loadExecutor(); err != nil {
+		return err
+	}
+	return b.executor.Run(ctx, id, rootfs, mounts, process, started)
+}
+
+func (b *llbBridge) Exec(ctx context.Context, id string, process executor.ProcessInfo) error {
+	if err := b.validateEntitlements(process); err != nil {
+		return err
+	}
+
+	if err := b.loadExecutor(); err != nil {
+		return err
+	}
+	return b.executor.Exec(ctx, id, process)
+}
+
+func (b *llbBridge) loadExecutor() error {
+	b.executorOnce.Do(func() {
+		w, err := b.resolveWorker()
+		if err != nil {
+			b.executorErr = err
+			return
+		}
+		b.executor = w.Executor()
+	})
+	return b.executorErr
 }
 
 type resultProxy struct {

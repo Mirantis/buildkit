@@ -4,9 +4,12 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 	"syscall"
 
 	"github.com/containerd/continuity/fs"
+	"github.com/moby/buildkit/util/system"
+	"github.com/sirupsen/logrus"
 )
 
 func MountStubsCleaner(dir string, mounts []Mount) func() {
@@ -36,14 +39,54 @@ func MountStubsCleaner(dir string, mounts []Mount) func() {
 
 	return func() {
 		for _, p := range paths {
+			p, err := fs.RootPath(dir, strings.TrimPrefix(p, dir))
+			if err != nil {
+				continue
+			}
+
 			st, err := os.Lstat(p)
 			if err != nil {
 				continue
 			}
-			if st.Size() != 0 {
+			if st.IsDir() {
+				entries, err := os.ReadDir(p)
+				if err != nil {
+					continue
+				}
+				if len(entries) != 0 {
+					continue
+				}
+			} else if st.Size() != 0 {
 				continue
 			}
-			os.Remove(p)
+
+			// Back up the timestamps of the dir for reproducible builds
+			// https://github.com/moby/buildkit/issues/3148
+			parent := filepath.Dir(p)
+			if realPath, err := fs.RootPath(dir, strings.TrimPrefix(parent, dir)); err != nil || realPath != parent {
+				continue
+			}
+
+			dirSt, err := os.Stat(parent)
+			if err != nil {
+				logrus.WithError(err).Warnf("Failed to stat %q (parent of mount stub %q)", dir, p)
+				continue
+			}
+			mtime := dirSt.ModTime()
+			atime, err := system.Atime(dirSt)
+			if err != nil {
+				logrus.WithError(err).Warnf("Failed to stat atime of %q (parent of mount stub %q)", dir, p)
+				atime = mtime
+			}
+
+			if err := os.Remove(p); err != nil {
+				logrus.WithError(err).Warnf("Failed to remove mount stub %q", p)
+			}
+
+			// Restore the timestamps of the dir
+			if err := os.Chtimes(parent, atime, mtime); err != nil {
+				logrus.WithError(err).Warnf("Failed to restore time time mount stub timestamp (os.Chtimes(%q, %v, %v))", dir, atime, mtime)
+			}
 		}
 	}
 }
