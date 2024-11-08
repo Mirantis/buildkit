@@ -101,15 +101,7 @@ func detect() error {
 	bklog.EnableLogWithTraceID(true)
 
 	if Resource == nil {
-		res, err := resource.Detect(context.Background(), serviceNameDetector{})
-		if err != nil {
-			return err
-		}
-		res, err = resource.Merge(resource.Default(), res)
-		if err != nil {
-			return err
-		}
-		Resource = res
+		Resource = detectResource()
 	}
 
 	sp := sdktrace.NewBatchSpanProcessor(exp)
