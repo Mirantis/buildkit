@@ -26,6 +26,12 @@ type detector struct {
 var ServiceName string
 var Recorder *TraceRecorder
 
+// Resource is the resource used by the tracer provider. It may be set
+// by an importing program before TracerProvider is first invoked to
+// override the detected resource (e.g. to keep the semconv schema URL
+// consistent with the program's own).
+var Resource *resource.Resource
+
 var detectors map[string]detector
 var once sync.Once
 var tp trace.TracerProvider
@@ -97,13 +103,8 @@ func detect() error {
 	// enable log with traceID when valid exporter
 	bklog.EnableLogWithTraceID(true)
 
-	res, err := resource.Detect(context.Background(), serviceNameDetector{})
-	if err != nil {
-		return err
-	}
-	res, err = resource.Merge(resource.Default(), res)
-	if err != nil {
-		return err
+	if Resource == nil {
+		Resource = detectResource()
 	}
 
 	sp := sdktrace.NewBatchSpanProcessor(exp)
@@ -112,7 +113,7 @@ func detect() error {
 		Recorder.flush = sp.ForceFlush
 	}
 
-	sdktp := sdktrace.NewTracerProvider(sdktrace.WithSpanProcessor(sp), sdktrace.WithResource(res))
+	sdktp := sdktrace.NewTracerProvider(sdktrace.WithSpanProcessor(sp), sdktrace.WithResource(Resource))
 	closers = append(closers, sdktp.Shutdown)
 
 	exporter = exp
