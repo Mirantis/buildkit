@@ -1,6 +1,6 @@
 module github.com/moby/buildkit
 
-go 1.20
+go 1.23.0
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.1.0
@@ -27,6 +27,7 @@ require (
 	github.com/containerd/typeurl/v2 v2.1.1
 	github.com/coreos/go-systemd/v22 v22.5.0
 	github.com/cyphar/filepath-securejoin v0.2.4
+	github.com/distribution/reference v0.6.0
 	github.com/docker/cli v24.0.4+incompatible
 	github.com/docker/distribution v2.8.2+incompatible
 	github.com/docker/docker v24.0.0-rc.2.0.20231024134502-df3a3211645c+incompatible // master (v25.0.0-dev)
@@ -36,20 +37,21 @@ require (
 	github.com/gogo/googleapis v1.4.1
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/protobuf v1.5.3
-	github.com/google/go-cmp v0.5.9
+	github.com/google/go-cmp v0.7.0
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/hashicorp/go-immutable-radix v1.3.1
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hashicorp/golang-lru v0.5.4
 	github.com/in-toto/in-toto-golang v0.5.0
-	github.com/klauspost/compress v1.17.2
+	github.com/klauspost/compress v1.18.2
 	github.com/mitchellh/hashstructure/v2 v2.0.2
+	github.com/moby/go-archive v0.2.0
 	github.com/moby/locker v1.0.1
-	github.com/moby/patternmatcher v0.5.0
-	github.com/moby/sys/mountinfo v0.6.2
+	github.com/moby/patternmatcher v0.6.0
+	github.com/moby/sys/mountinfo v0.7.2
 	github.com/moby/sys/signal v0.7.0
-	github.com/moby/sys/user v0.1.0
+	github.com/moby/sys/user v0.4.0
 	github.com/morikuni/aec v1.0.0
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.0-rc3
@@ -85,7 +87,7 @@ require (
 	golang.org/x/crypto v0.2.0
 	golang.org/x/net v0.8.0
 	golang.org/x/sync v0.1.0
-	golang.org/x/sys v0.7.0
+	golang.org/x/sys v0.31.0
 	golang.org/x/time v0.3.0
 	google.golang.org/genproto v0.0.0-20230306155012-7f2fa6fef1f4
 	google.golang.org/grpc v1.53.0
@@ -94,7 +96,7 @@ require (
 )
 
 require (
-	github.com/AdaLogics/go-fuzz-headers v0.0.0-20230106234847-43070de90fa1 // indirect
+	github.com/AdaLogics/go-fuzz-headers v0.0.0-20240806141605-e8a1dd7889d6 // indirect
 	github.com/AdamKorcz/go-118-fuzz-build v0.0.0-20221215162035-5330a85ea652 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.1.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.0.0 // indirect
@@ -125,7 +127,6 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dimchansky/utfbom v1.1.1 // indirect
-	github.com/distribution/reference v0.6.0 // indirect
 	github.com/docker/docker-credential-helpers v0.7.0 // indirect
 	github.com/docker/go-events v0.0.0-20190806004212-e31b211e4f1c // indirect
 	github.com/docker/go-metrics v0.0.1 // indirect
@@ -143,8 +144,10 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
-	github.com/moby/sys/mount v0.3.3 // indirect
-	github.com/moby/sys/sequential v0.5.0 // indirect
+	github.com/moby/sys/mount v0.3.4 // indirect
+	github.com/moby/sys/reexec v0.1.0 // indirect
+	github.com/moby/sys/sequential v0.6.0 // indirect
+	github.com/moby/sys/userns v0.1.0 // indirect
 	github.com/opencontainers/runc v1.1.7 // indirect
 	github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect

@@ -1,5 +1,5 @@
-# github.com/AdaLogics/go-fuzz-headers v0.0.0-20230106234847-43070de90fa1
-## explicit; go 1.18
+# github.com/AdaLogics/go-fuzz-headers v0.0.0-20240806141605-e8a1dd7889d6
+## explicit; go 1.20
 github.com/AdaLogics/go-fuzz-headers
 # github.com/AdamKorcz/go-118-fuzz-build v0.0.0-20221215162035-5330a85ea652
 ## explicit; go 1.18
@@ -468,17 +468,11 @@ github.com/docker/docker/api/types/volume
 github.com/docker/docker/client
 github.com/docker/docker/errdefs
 github.com/docker/docker/image/spec/specs-go/v1
-github.com/docker/docker/internal/mounttree
 github.com/docker/docker/internal/multierror
-github.com/docker/docker/internal/unshare
 github.com/docker/docker/libnetwork/resolvconf
-github.com/docker/docker/pkg/archive
-github.com/docker/docker/pkg/chrootarchive
 github.com/docker/docker/pkg/homedir
 github.com/docker/docker/pkg/idtools
 github.com/docker/docker/pkg/ioutils
-github.com/docker/docker/pkg/longpath
-github.com/docker/docker/pkg/pools
 github.com/docker/docker/pkg/reexec
 github.com/docker/docker/pkg/system
 github.com/docker/docker/profiles/seccomp
@@ -564,8 +558,8 @@ github.com/golang/protobuf/ptypes
 github.com/golang/protobuf/ptypes/any
 github.com/golang/protobuf/ptypes/duration
 github.com/golang/protobuf/ptypes/timestamp
-# github.com/google/go-cmp v0.5.9
-## explicit; go 1.13
+# github.com/google/go-cmp v0.7.0
+## explicit; go 1.21
 github.com/google/go-cmp/cmp
 github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
@@ -619,12 +613,13 @@ github.com/in-toto/in-toto-golang/in_toto/slsa_provenance/v0.2
 # github.com/jmespath/go-jmespath v0.4.0
 ## explicit; go 1.14
 github.com/jmespath/go-jmespath
-# github.com/klauspost/compress v1.17.2
-## explicit; go 1.18
+# github.com/klauspost/compress v1.18.2
+## explicit; go 1.23
 github.com/klauspost/compress
 github.com/klauspost/compress/fse
 github.com/klauspost/compress/huff0
 github.com/klauspost/compress/internal/cpuinfo
+github.com/klauspost/compress/internal/le
 github.com/klauspost/compress/internal/snapref
 github.com/klauspost/compress/zstd
 github.com/klauspost/compress/zstd/internal/xxhash
@@ -638,27 +633,41 @@ github.com/matttproud/golang_protobuf_extensions/pbutil
 # github.com/mitchellh/hashstructure/v2 v2.0.2
 ## explicit; go 1.14
 github.com/mitchellh/hashstructure/v2
+# github.com/moby/go-archive v0.2.0
+## explicit; go 1.23.0
+github.com/moby/go-archive
+github.com/moby/go-archive/chrootarchive
+github.com/moby/go-archive/compression
+github.com/moby/go-archive/internal/mounttree
+github.com/moby/go-archive/internal/unshare
+github.com/moby/go-archive/tarheader
 # github.com/moby/locker v1.0.1
 ## explicit; go 1.13
 github.com/moby/locker
-# github.com/moby/patternmatcher v0.5.0
+# github.com/moby/patternmatcher v0.6.0
 ## explicit; go 1.19
 github.com/moby/patternmatcher
-# github.com/moby/sys/mount v0.3.3
-## explicit; go 1.16
+# github.com/moby/sys/mount v0.3.4
+## explicit; go 1.17
 github.com/moby/sys/mount
-# github.com/moby/sys/mountinfo v0.6.2
-## explicit; go 1.16
+# github.com/moby/sys/mountinfo v0.7.2
+## explicit; go 1.17
 github.com/moby/sys/mountinfo
-# github.com/moby/sys/sequential v0.5.0
+# github.com/moby/sys/reexec v0.1.0
+## explicit; go 1.18
+github.com/moby/sys/reexec
+# github.com/moby/sys/sequential v0.6.0
 ## explicit; go 1.17
 github.com/moby/sys/sequential
 # github.com/moby/sys/signal v0.7.0
 ## explicit; go 1.16
 github.com/moby/sys/signal
-# github.com/moby/sys/user v0.1.0
+# github.com/moby/sys/user v0.4.0
 ## explicit; go 1.17
 github.com/moby/sys/user
+# github.com/moby/sys/userns v0.1.0
+## explicit; go 1.21
+github.com/moby/sys/userns
 # github.com/morikuni/aec v1.0.0
 ## explicit
 github.com/morikuni/aec
@@ -885,11 +894,10 @@ golang.org/x/net/trace
 golang.org/x/sync/errgroup
 golang.org/x/sync/semaphore
 golang.org/x/sync/singleflight
-# golang.org/x/sys v0.7.0
-## explicit; go 1.17
+# golang.org/x/sys v0.31.0
+## explicit; go 1.23.0
 golang.org/x/sys/cpu
 golang.org/x/sys/execabs
-golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
 golang.org/x/sys/windows
 golang.org/x/sys/windows/registry
