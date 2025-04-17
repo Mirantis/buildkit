@@ -26,11 +26,11 @@ env:
 
 jobs:
   base:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v2
@@ -60,7 +60,7 @@ jobs:
           CACHE_TO: type=gha,scope=${{ env.CACHE_GHA_SCOPE_IT }}
 
   test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: [base]
     strategy:
       fail-fast: false
@@ -90,7 +90,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v2
@@ -119,7 +119,7 @@ jobs:
           CACHE_FROM: type=gha,scope=${{ env.CACHE_GHA_SCOPE_IT }} type=gha,scope=${{ env.CACHE_GHA_SCOPE_BINARIES }}
       -
         name: Upload coverage file
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage
           path: ./coverage
@@ -130,16 +130,16 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          # - ubuntu-20.04
+          # - ubuntu-22.04
           # - macOS-11
           - windows-2022
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Set up Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
           go-version: 1.18
           cache: true
@@ -158,18 +158,18 @@ jobs:
         shell: bash
       -
         name: Upload coverage file
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage
           path: ./coverage
 
   upload-coverage:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: [test, test-os]
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Download coverage files
         uses: actions/download-artifact@v3
@@ -178,7 +178,7 @@ jobs:
           path: ./coverage
       -
         name: List coverage files
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         id: files
         with:
           result-encoding: string
@@ -189,16 +189,16 @@ jobs:
               .join(',');
       -
         name: Send to Codecov
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v4
         with:
           files: ${{ steps.files.outputs.result }}
 
   cross:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v2
@@ -223,7 +223,7 @@ jobs:
           CACHE_TO: type=gha,scope=${{ env.CACHE_GHA_SCOPE_CROSS }}
 
   release-base:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     outputs:
       tag: ${{ steps.prep.outputs.tag }}
       push: ${{ steps.prep.outputs.push }}
@@ -249,7 +249,7 @@ jobs:
           echo ::set-output name=push::${PUSH}
 
   image:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: [release-base, test, cross]
     strategy:
       fail-fast: false
@@ -260,7 +260,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v2
@@ -291,12 +291,12 @@ jobs:
           CACHE_TO: type=gha,scope=image${{ matrix.target-stage }}
 
   binaries:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: [release-base, test, cross]
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v2
@@ -323,7 +323,7 @@ jobs:
           mv ./release-out/**/* ./release-out/
       -
         name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: buildkit
           path: ./release-out/*
@@ -340,7 +340,7 @@ jobs:
           name: ${{ needs.release-base.outputs.tag }}
 
   frontend-base:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     if: github.event_name != 'schedule'
     outputs:
       typ: ${{ steps.prep.outputs.typ }}
@@ -366,13 +366,13 @@ jobs:
           echo ::set-output name=push::${PUSH}
 
   frontend-image:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     if: github.event_name != 'schedule'
     needs: [frontend-base, test]
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v2
