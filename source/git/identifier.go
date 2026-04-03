@@ -37,9 +37,7 @@ func NewGitIdentifier(remoteURL string) (*GitIdentifier, error) {
 		repo.Ref = u.Fragment.Ref
 		repo.Subdir = u.Fragment.Subdir
 	}
-	if sd := path.Clean(repo.Subdir); sd == "/" || sd == "." {
-		repo.Subdir = ""
-	}
+	repo.Subdir = strings.TrimPrefix(path.Join("/", repo.Subdir), "/")
 	if err := validateGitRef(repo.Ref); err != nil {
 		return nil, err
 	}
