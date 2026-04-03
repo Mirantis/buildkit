@@ -26,6 +26,7 @@ require (
 	github.com/containerd/stargz-snapshotter/estargz v0.14.3
 	github.com/containerd/typeurl/v2 v2.1.1
 	github.com/coreos/go-systemd/v22 v22.5.0
+	github.com/cyphar/filepath-securejoin v0.2.4
 	github.com/distribution/reference v0.5.0
 	github.com/docker/cli v24.0.5+incompatible
 	github.com/docker/docker v24.0.0-rc.2.0.20230905130451-032797ea4bcb+incompatible // master (v25.0.0-dev)
