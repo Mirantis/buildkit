@@ -763,4 +763,3 @@ func (md cacheRefMetadata) setGitSnapshot(key string) error {
 func (md cacheRefMetadata) setGitRemote(key string) error {
 	return md.SetString(keyGitRemote, key, gitRemoteIndex+key)
 }
-
