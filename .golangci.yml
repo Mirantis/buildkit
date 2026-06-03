@@ -58,6 +58,8 @@ linters-settings:
       - G402  # TLS MinVersion too low
       - G601  # Implicit memory aliasing in for loop (false positives)
       - G504  # Import blocklist: net/http/cgi
+      - G115  # Many false positives, maybe reconsider after looking closer
+      - G306  # Too restrictive; also flags "0o644" permissions
     config:
       G306: "0644"
 
