@@ -708,6 +708,10 @@ func TestValidateDirsOnly(t *testing.T) {
 	require.NoError(t, os.Symlink("/tmp", filepath.Join(root, "escape")))
 	require.NoError(t, os.WriteFile(filepath.Join(root, "file.txt"), []byte("x"), 0o644))
 
+	r, err := os.OpenRoot(root)
+	require.NoError(t, err)
+	defer r.Close()
+
 	tests := []struct {
 		subpath string
 		wantErr bool
@@ -723,12 +727,11 @@ func TestValidateDirsOnly(t *testing.T) {
 		tt := tt
 		t.Run(tt.subpath, func(t *testing.T) {
 			t.Parallel()
-			f, err := openSubdirSafe(root, tt.subpath)
+			err := validateDirsOnly(r, tt.subpath)
 			if tt.wantErr {
 				require.Error(t, err, "subpath %q should be rejected", tt.subpath)
 			} else {
 				require.NoError(t, err, "subpath %q should be accepted", tt.subpath)
-				f.Close()
 			}
 		})
 	}

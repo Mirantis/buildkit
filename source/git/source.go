@@ -570,7 +570,18 @@ func (gs *gitSourceHandler) Snapshot(ctx context.Context, g session.Group) (out 
 		}
 		if subdir != "." {
 			subdir = filepath.FromSlash(subdir)
-			d, err := openSubdirSafe(cd, subdir)
+			subdir = rootRelativePath(subdir)
+			cdRoot, err := os.OpenRoot(cd)
+			if err != nil {
+				return nil, errors.Wrapf(err, "failed to open checkout dir root")
+			}
+			defer cdRoot.Close()
+
+			if err := validateDirsOnly(cdRoot, subdir); err != nil {
+				return nil, errors.Wrapf(err, "invalid subdir %v", subdir)
+			}
+
+			d, err := cdRoot.Open(subdir)
 			if err != nil {
 				return nil, errors.Wrapf(err, "failed to open subdir %v", subdir)
 			}
@@ -579,7 +590,7 @@ func (gs *gitSourceHandler) Snapshot(ctx context.Context, g session.Group) (out 
 					d.Close()
 				}
 			}()
-			names, err := readdirnames(d)
+			names, err := d.Readdirnames(0)
 			if err != nil {
 				return nil, err
 			}
@@ -752,6 +763,34 @@ func (md cacheRefMetadata) setGitSnapshot(key string) error {
 
 func (md cacheRefMetadata) setGitRemote(key string) error {
 	return md.SetString(keyGitRemote, key, gitRemoteIndex+key)
+}
+
+// rootRelativePath returns path cleaned and stripped of any leading separator.
+func rootRelativePath(path string) string {
+	return strings.TrimPrefix(filepath.Clean(path), string(filepath.Separator))
+}
+
+// validateDirsOnly checks that the given subpath in the repository
+// only contains directories without any symlinks or files.
+func validateDirsOnly(r *os.Root, subpath string) error {
+	rel := rootRelativePath(subpath)
+	if rel == "" || rel == "." {
+		return nil
+	}
+
+	p := ""
+	for part := range strings.SplitSeq(rel, string(filepath.Separator)) {
+		p = filepath.Join(p, part)
+
+		fi, err := r.Lstat(p)
+		if err != nil {
+			return errors.Wrapf(err, "failed to lstat %q", p)
+		}
+		if !fi.IsDir() {
+			return errors.Errorf("git subpath %q contains non-directory %q", subpath, p)
+		}
+	}
+	return nil
 }
 
 func gitCLI(opts ...gitutil.Option) *gitutil.GitCLI {
