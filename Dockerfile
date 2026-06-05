@@ -40,7 +40,7 @@ FROM alpine-$TARGETARCH AS alpinebase
 FROM --platform=$BUILDPLATFORM tonistiigi/xx:${XX_VERSION} AS xx
 
 # go base image
-FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS golatest
+FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine AS golatest
 
 # git stage is used for checking out remote repository sources
 FROM --platform=$BUILDPLATFORM alpine:${ALPINE_VERSION} AS git

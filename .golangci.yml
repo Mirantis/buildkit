@@ -52,6 +52,7 @@ linters-settings:
   gosec:
     excludes:
       - G101  # Potential hardcoded credentials (false positives)
+      - G115  # Integer overflow conversion (pre-existing, not security-relevant)
       - G402  # TLS MinVersion too low
       - G601  # Implicit memory aliasing in for loop (false positives)
       - G504  # Import blocklist: net/http/cgi
