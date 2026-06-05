@@ -1,5 +1,6 @@
 run:
   timeout: 10m
+  go: "1.24"
   skip-files:
     - ".*\\.pb\\.go$"
 

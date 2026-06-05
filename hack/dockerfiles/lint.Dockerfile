@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile-upstream:master
 
-ARG GO_VERSION=1.21
+ARG GO_VERSION=1.24
 ARG PROTOLINT_VERSION=0.45.0
 ARG GOLANGCI_LINT_VERSION=1.54.2
 
