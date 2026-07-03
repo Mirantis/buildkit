@@ -61,7 +61,7 @@ jobs:
       -
         name: Deps
         run: |
-          npm install js-yaml
+          npm install js-yaml@v4-legacy
       -
         name: Set outputs
         id: set
