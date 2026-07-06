@@ -15,11 +15,11 @@ ARG MINIO_VERSION=RELEASE.2022-05-03T20-36-08Z
 ARG MINIO_MC_VERSION=RELEASE.2022-05-04T06-07-55Z
 ARG AZURITE_VERSION=3.18.0
 ARG GOTESTSUM_VERSION=v1.9.0
-ARG DELVE_VERSION=v1.21.0
+ARG DELVE_VERSION=v1.24.0
 
-ARG GO_VERSION=1.21
+ARG GO_VERSION=1.24
 ARG ALPINE_VERSION=3.18
-ARG XX_VERSION=1.3.0
+ARG XX_VERSION=1.6.1
 ARG BUILDKIT_DEBUG
 
 # minio for s3 integration tests
@@ -40,7 +40,7 @@ FROM alpine-$TARGETARCH AS alpinebase
 FROM --platform=$BUILDPLATFORM tonistiigi/xx:${XX_VERSION} AS xx
 
 # go base image
-FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS golatest
+FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine AS golatest
 
 # git stage is used for checking out remote repository sources
 FROM --platform=$BUILDPLATFORM alpine:${ALPINE_VERSION} AS git

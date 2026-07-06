@@ -17,7 +17,7 @@ func WithSource(err error, src Source) error {
 	return &ErrorSource{Source: src, error: err}
 }
 
-type ErrorSource struct {
+type ErrorSource struct { //nolint:errname
 	Source
 	error
 }

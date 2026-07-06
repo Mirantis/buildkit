@@ -365,7 +365,7 @@ func (gs *gitSourceHandler) CacheKey(ctx context.Context, g session.Group, index
 
 	// TODO: should we assume that remote tag is immutable? add a timer?
 
-	buf, err := git.Run(ctx, "ls-remote", "origin", ref)
+	buf, err := git.Run(ctx, "ls-remote", "--", "origin", ref)
 	if err != nil {
 		return "", "", nil, false, errors.Wrapf(err, "failed to fetch remote %s", urlutil.RedactCredentials(remote))
 	}
@@ -435,7 +435,7 @@ func (gs *gitSourceHandler) Snapshot(ctx context.Context, g session.Group) (out 
 	doFetch := true
 	if isCommitSHA(ref) {
 		// skip fetch if commit already exists
-		if _, err := git.Run(ctx, "cat-file", "-e", ref+"^{commit}"); err == nil {
+		if _, err := git.Run(ctx, "cat-file", "-e", "--", ref+"^{commit}"); err == nil {
 			doFetch = false
 		}
 	}
@@ -454,7 +454,7 @@ func (gs *gitSourceHandler) Snapshot(ctx context.Context, g session.Group) (out 
 		}
 		args = append(args, "origin")
 		if !isCommitSHA(ref) {
-			args = append(args, "--force", ref+":tags/"+ref)
+			args = append(args, "--force", "--", ref+":tags/"+ref)
 			// local refs are needed so they would be advertised on next fetches. Force is used
 			// in case the ref is a branch and it now points to a different commit sha
 			// TODO: is there a better way to do this?
@@ -494,7 +494,7 @@ func (gs *gitSourceHandler) Snapshot(ctx context.Context, g session.Group) (out 
 		}
 	}()
 
-	subdir := path.Clean(gs.src.Subdir)
+	subdir := path.Join("/", gs.src.Subdir)
 	if subdir == "/" {
 		subdir = "."
 	}
@@ -535,7 +535,7 @@ func (gs *gitSourceHandler) Snapshot(ctx context.Context, g session.Group) (out 
 		} else {
 			pullref += ":" + pullref
 		}
-		_, err = checkoutGit.Run(ctx, "fetch", "-u", "--depth=1", "origin", pullref)
+		_, err = checkoutGit.Run(ctx, "fetch", "-u", "--depth=1", "--", "origin", pullref)
 		if err != nil {
 			return nil, err
 		}
@@ -569,7 +569,19 @@ func (gs *gitSourceHandler) Snapshot(ctx context.Context, g session.Group) (out 
 			return nil, errors.Wrapf(err, "failed to checkout remote %s", urlutil.RedactCredentials(gs.src.Remote))
 		}
 		if subdir != "." {
-			d, err := os.Open(filepath.Join(cd, subdir))
+			subdir = filepath.FromSlash(subdir)
+			subdir = rootRelativePath(subdir)
+			cdRoot, err := os.OpenRoot(cd)
+			if err != nil {
+				return nil, errors.Wrapf(err, "failed to open checkout dir root")
+			}
+			defer cdRoot.Close()
+
+			if err := validateDirsOnly(cdRoot, subdir); err != nil {
+				return nil, errors.Wrapf(err, "invalid subdir %v", subdir)
+			}
+
+			d, err := cdRoot.Open(subdir)
 			if err != nil {
 				return nil, errors.Wrapf(err, "failed to open subdir %v", subdir)
 			}
@@ -761,4 +773,32 @@ func gitCLI(opts ...gitutil.Option) *gitutil.GitCLI {
 		}),
 	}, opts...)
 	return gitutil.NewGitCLI(opts...)
+}
+
+// validateDirsOnly checks that the given subpath in the repository
+// only contains directories without any symlinks or files.
+func validateDirsOnly(r *os.Root, subpath string) error {
+	rel := rootRelativePath(subpath)
+	if rel == "" || rel == "." {
+		return nil
+	}
+
+	p := ""
+	for part := range strings.SplitSeq(rel, string(filepath.Separator)) {
+		p = filepath.Join(p, part)
+
+		fi, err := r.Lstat(p)
+		if err != nil {
+			return errors.Wrapf(err, "failed to lstat %q", p)
+		}
+		if !fi.IsDir() {
+			return errors.Errorf("git subpath %q contains non-directory %q", subpath, p)
+		}
+	}
+	return nil
+}
+
+// rootRelativePath returns path cleaned and stripped of any leading separator.
+func rootRelativePath(path string) string {
+	return strings.TrimPrefix(filepath.Clean(path), string(filepath.Separator))
 }
