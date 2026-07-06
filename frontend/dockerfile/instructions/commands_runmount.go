@@ -176,7 +176,7 @@ func parseMount(val string, expander SingleWordExpander) (*Mount, error) {
 				return nil, err
 			}
 		} else if key == "from" {
-			if matched, err := regexp.MatchString(`\$.`, value); err != nil { //nolint
+			if matched, err := regexp.MatchString(`\$.`, value); err != nil {
 				return nil, err
 			} else if matched {
 				return nil, errors.Errorf("'%s' doesn't support variable expansion, define alias stage instead", key)
