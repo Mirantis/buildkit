@@ -765,9 +765,14 @@ func (md cacheRefMetadata) setGitRemote(key string) error {
 	return md.SetString(keyGitRemote, key, gitRemoteIndex+key)
 }
 
-// rootRelativePath returns path cleaned and stripped of any leading separator.
-func rootRelativePath(path string) string {
-	return strings.TrimPrefix(filepath.Clean(path), string(filepath.Separator))
+func gitCLI(opts ...gitutil.Option) *gitutil.GitCLI {
+	opts = append([]gitutil.Option{
+		gitutil.WithExec(runWithStandardUmask),
+		gitutil.WithStreams(func(ctx context.Context) (stdout, stderr io.WriteCloser, flush func()) {
+			return logs.NewLogStreams(ctx, false)
+		}),
+	}, opts...)
+	return gitutil.NewGitCLI(opts...)
 }
 
 // validateDirsOnly checks that the given subpath in the repository
@@ -793,12 +798,7 @@ func validateDirsOnly(r *os.Root, subpath string) error {
 	return nil
 }
 
-func gitCLI(opts ...gitutil.Option) *gitutil.GitCLI {
-	opts = append([]gitutil.Option{
-		gitutil.WithExec(runWithStandardUmask),
-		gitutil.WithStreams(func(ctx context.Context) (stdout, stderr io.WriteCloser, flush func()) {
-			return logs.NewLogStreams(ctx, false)
-		}),
-	}, opts...)
-	return gitutil.NewGitCLI(opts...)
+// rootRelativePath returns path cleaned and stripped of any leading separator.
+func rootRelativePath(path string) string {
+	return strings.TrimPrefix(filepath.Clean(path), string(filepath.Separator))
 }
