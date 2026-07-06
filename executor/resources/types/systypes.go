@@ -57,7 +57,7 @@ type SysMemoryStat struct {
 }
 
 type SysSample struct {
-	Timestamp_     time.Time      `json:"timestamp"`
+	Timestamp_     time.Time      `json:"timestamp"` //nolint:revive
 	CPUStat        *SysCPUStat    `json:"cpuStat,omitempty"`
 	ProcStat       *ProcStat      `json:"procStat,omitempty"`
 	MemoryStat     *SysMemoryStat `json:"memoryStat,omitempty"`
