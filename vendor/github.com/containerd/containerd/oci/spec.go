@@ -18,6 +18,8 @@ package oci
 
 import (
 	"context"
+	"encoding/json"
+	"os"
 	"path/filepath"
 	"runtime"
 
@@ -25,7 +27,7 @@ import (
 
 	"github.com/containerd/containerd/containers"
 	"github.com/containerd/containerd/namespaces"
-	"github.com/containerd/containerd/platforms"
+	"github.com/containerd/platforms"
 )
 
 const (
@@ -43,10 +45,26 @@ var (
 // to be created without the "issues" with go vendoring and package imports
 type Spec = specs.Spec
 
+const ConfigFilename = "config.json"
+
+// ReadSpec deserializes JSON into an OCI runtime Spec from a given path.
+func ReadSpec(path string) (*Spec, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	var s Spec
+	if err := json.NewDecoder(f).Decode(&s); err != nil {
+		return nil, err
+	}
+	return &s, nil
+}
+
 // GenerateSpec will generate a default spec from the provided image
 // for use as a containerd container
 func GenerateSpec(ctx context.Context, client Client, c *containers.Container, opts ...SpecOpts) (*Spec, error) {
-	return GenerateSpecWithPlatform(ctx, client, platforms.DefaultString(), c, opts...)
+	return GenerateSpecWithPlatform(ctx, client, platforms.Format(platforms.DefaultSpec()), c, opts...) // For 1.7 continue using the old format without os-version included.
 }
 
 // GenerateSpecWithPlatform will generate a default spec from the provided image
@@ -175,6 +193,7 @@ func populateDefaultUnixSpec(ctx context.Context, s *Spec, id string) error {
 				"/proc/timer_stats",
 				"/proc/sched_debug",
 				"/sys/firmware",
+				"/sys/devices/virtual/powercap",
 				"/proc/scsi",
 			},
 			ReadonlyPaths: []string{

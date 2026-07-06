@@ -11,7 +11,6 @@ import (
 	"time"
 
 	ctd "github.com/containerd/containerd"
-	"github.com/containerd/containerd/pkg/userns"
 	"github.com/moby/buildkit/cmd/buildkitd/config"
 	"github.com/moby/buildkit/util/bklog"
 	"github.com/moby/buildkit/util/network/cniprovider"
@@ -19,6 +18,7 @@ import (
 	"github.com/moby/buildkit/worker"
 	"github.com/moby/buildkit/worker/base"
 	"github.com/moby/buildkit/worker/containerd"
+	"github.com/moby/sys/userns"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
 	"golang.org/x/sync/semaphore"

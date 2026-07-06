@@ -58,7 +58,7 @@ type BridgeClient struct {
 }
 
 func (c *BridgeClient) Solve(ctx context.Context, req client.SolveRequest) (*client.Result, error) {
-	res, err := c.FrontendLLBBridge.Solve(ctx, frontend.SolveRequest{
+	res, err := c.FrontendLLBBridge.Solve(ctx, frontend.SolveRequest{ //nolint:gosimple
 		Evaluate:       req.Evaluate,
 		Definition:     req.Definition,
 		Frontend:       req.Frontend,
