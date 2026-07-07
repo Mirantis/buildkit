@@ -1090,7 +1090,7 @@ func newTestPrompt(ctx context.Context, t *testing.T, input io.Writer, output *b
 func (p *testPrompt) String() string { return p.prompt }
 
 func (p *testPrompt) SendExit(status int) {
-	p.input.Write([]byte(fmt.Sprintf("exit %d\n", status)))
+	fmt.Fprintf(p.input, "exit %d\n", status)
 }
 
 func (p *testPrompt) Send(cmd string) {

@@ -66,6 +66,18 @@ linters:
         - G306  # Too restrictive; also flags "0o644" permissions
       config:
         G306: "0644"
+    staticcheck:
+      checks:
+        # Defaults
+        - all
+        - "-ST1000"
+        - "-ST1003"
+        - "-ST1016"
+        - "-ST1020"
+        - "-ST1021"
+        - "-ST1022"
+        # Custom
+        - "-QF1008"  # Omit embedded fields from selector expression. (Very noisy)
   exclusions:
     generated: lax
     presets:
@@ -92,6 +104,9 @@ linters:
       - linters:
           - revive
         text: "if-return"
+      - linters:
+          - staticcheck
+        text: "SA1019: intoto\\.\\w+ is deprecated"
     paths:
       - ".*\\.pb\\.go$"
       - third_party$
