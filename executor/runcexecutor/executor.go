@@ -608,7 +608,7 @@ func runcProcessHandle(ctx context.Context, killer procKiller) (*procHandle, con
 	// preserve the logger on the context used for the runc process handling
 	runcCtx = bklog.WithLogger(runcCtx, bklog.G(ctx))
 
-	go func() {
+	go func() { //nolint:gosec // G118 false positive
 		// Wait for pid
 		select {
 		case <-ctx.Done():

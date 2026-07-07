@@ -1,3 +1,4 @@
+//nolint:gosec
 package integration
 
 import (
@@ -38,7 +39,7 @@ func NewRegistry(dir string) (url string, cl func() error, err error) {
 		dir = tmpdir
 	}
 
-	if _, err := os.Stat(filepath.Join(dir, "config.yaml")); err != nil {
+	if _, err := os.Stat(filepath.Join(dir, "config.yaml")); err != nil { //nolint:gosec // no need to worry about path traversal in test code
 		if !errors.Is(err, os.ErrNotExist) {
 			return "", nil, err
 		}

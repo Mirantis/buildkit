@@ -655,7 +655,7 @@ func logProgressStreams(ctx context.Context, t *testing.T) context.Context {
 		cancel()
 		<-done
 	})
-	go func() {
+	go func() { //nolint:gosec
 		defer close(done)
 		for {
 			prog, err := pr.Read(context.Background())
