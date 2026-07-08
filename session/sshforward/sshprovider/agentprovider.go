@@ -152,7 +152,7 @@ func toAgentSource(paths []string) (source, error) {
 			continue
 		}
 
-		fi, err := os.Stat(p)
+		fi, err := os.Stat(p) //nolint:gosec // users can exploit themselves if they feel like it
 		if err != nil {
 			return source{}, errors.WithStack(err)
 		}
@@ -161,7 +161,7 @@ func toAgentSource(paths []string) (source, error) {
 			continue
 		}
 
-		f, err := os.Open(p)
+		f, err := os.Open(p) //nolint:gosec
 		if err != nil {
 			return source{}, errors.Wrapf(err, "failed to open %s", p)
 		}

@@ -19,7 +19,7 @@ type Dialer func(ctx context.Context, proto string, meta map[string][]string) (n
 func TestStream(handler Handler) Dialer {
 	s1, s2 := sockPair()
 	return func(ctx context.Context, proto string, meta map[string][]string) (net.Conn, error) {
-		go func() {
+		go func() { //nolint:gosec
 			err := handler(context.TODO(), s1, meta)
 			if err != nil {
 				bklog.G(ctx).Error(err)

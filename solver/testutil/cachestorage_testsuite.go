@@ -44,10 +44,10 @@ func testResults(t *testing.T, st solver.CacheKeyStorage) {
 
 	// Windows time.Now() resolution can be quite coarse, so frequently
 	// time.Now() will be the same between two nearby calls.
-	if time.Now() == timeNow {
+	if time.Now().Equal(timeNow) {
 		time.Sleep(time.Duration(100) * time.Millisecond)
 	}
-	require.NotEqual(t, timeNow, time.Now(), "time has stopped")
+	require.False(t, timeNow.Equal(time.Now()), "time has stopped")
 
 	err = st.AddResult("foo", solver.CacheResult{
 		ID:        "foo1",

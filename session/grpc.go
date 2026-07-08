@@ -56,7 +56,7 @@ func grpcClientConn(ctx context.Context, conn net.Conn) (context.Context, *grpc.
 		dialOpts = append(dialOpts, grpc.WithStatsHandler(statsHandler))
 	}
 
-	cc, err := grpc.DialContext(ctx, "localhost", dialOpts...)
+	cc, err := grpc.DialContext(ctx, "localhost", dialOpts...) //nolint:staticcheck
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "failed to create grpc client")
 	}

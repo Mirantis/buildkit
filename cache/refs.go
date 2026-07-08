@@ -1413,7 +1413,7 @@ func (cr *cacheRecord) finalize(ctx context.Context) error {
 	cr.mountCache = nil
 
 	mutable.dead = true
-	go func() {
+	go func() { //nolint:gosec
 		cr.cm.mu.Lock()
 		defer cr.cm.mu.Unlock()
 		if err := mutable.remove(context.TODO(), true); err != nil {

@@ -197,7 +197,7 @@ func shlexf(str string, replace bool, v ...interface{}) StateOption {
 	}
 	return func(s State) State {
 		arg, err := shlex.Split(str)
-		if err != nil { //nolint
+		if err != nil { //nolint:staticcheck
 			// TODO: handle error
 		}
 		return args(arg...)(s)

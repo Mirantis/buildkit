@@ -57,7 +57,7 @@ func New(ctx context.Context, address string, opts ...ClientOpt) (*Client, error
 
 	for _, o := range opts {
 		if _, ok := o.(*withFailFast); ok {
-			gopts = append(gopts, grpc.FailOnNonTempDialError(true))
+			gopts = append(gopts, grpc.FailOnNonTempDialError(true)) //nolint:staticcheck
 		}
 		if credInfo, ok := o.(*withCredentials); ok {
 			if creds == nil {
@@ -146,7 +146,7 @@ func New(ctx context.Context, address string, opts ...ClientOpt) (*Client, error
 	gopts = append(gopts, grpc.WithStreamInterceptor(grpcerrors.StreamClientInterceptor))
 	gopts = append(gopts, customDialOptions...)
 
-	conn, err := grpc.DialContext(ctx, address, gopts...)
+	conn, err := grpc.DialContext(ctx, address, gopts...) //nolint:staticcheck
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to dial %q . make sure buildkitd is running", address)
 	}

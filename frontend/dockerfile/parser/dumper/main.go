@@ -17,7 +17,7 @@ func main() {
 	}
 
 	for _, fn := range os.Args[1:] {
-		f, err = os.Open(fn)
+		f, err = os.Open(fn) //nolint:gosec
 		if err != nil {
 			panic(err)
 		}
