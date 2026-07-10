@@ -14,10 +14,9 @@ import (
 	"strings"
 
 	"github.com/containerd/containerd/pkg/seed" //nolint:staticcheck // SA1019 deprecated
-	"github.com/containerd/containerd/pkg/userns"
-	"github.com/containerd/containerd/platforms"
 	"github.com/containerd/containerd/remotes/docker"
 	"github.com/containerd/containerd/sys"
+	"github.com/containerd/platforms"
 	sddaemon "github.com/coreos/go-systemd/v22/daemon"
 	"github.com/docker/docker/pkg/reexec"
 	"github.com/gofrs/flock"
@@ -55,6 +54,7 @@ import (
 	"github.com/moby/buildkit/util/tracing/transform"
 	"github.com/moby/buildkit/version"
 	"github.com/moby/buildkit/worker"
+	"github.com/moby/sys/userns"
 	ocispecs "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -263,7 +263,7 @@ func main() {
 			return err
 		}
 
-		streamTracer := otelgrpc.StreamServerInterceptor(otelgrpc.WithTracerProvider(tp), otelgrpc.WithPropagators(propagators))
+		streamTracer := otelgrpc.StreamServerInterceptor(otelgrpc.WithTracerProvider(tp), otelgrpc.WithPropagators(propagators)) //nolint:staticcheck
 
 		unary := grpc_middleware.ChainUnaryServer(unaryInterceptor(ctx, tp), grpcerrors.UnaryServerInterceptor)
 		stream := grpc_middleware.ChainStreamServer(streamTracer, grpcerrors.StreamServerInterceptor)
@@ -615,7 +615,7 @@ func getListener(addr string, uid, gid int, tlsConfig *tls.Config) (net.Listener
 }
 
 func unaryInterceptor(globalCtx context.Context, tp trace.TracerProvider) grpc.UnaryServerInterceptor {
-	withTrace := otelgrpc.UnaryServerInterceptor(otelgrpc.WithTracerProvider(tp), otelgrpc.WithPropagators(propagators))
+	withTrace := otelgrpc.UnaryServerInterceptor(otelgrpc.WithTracerProvider(tp), otelgrpc.WithPropagators(propagators)) //nolint:staticcheck
 
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
 		ctx, cancel := context.WithCancel(ctx)

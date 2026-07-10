@@ -47,8 +47,8 @@ func grpcClientConn(ctx context.Context, conn net.Conn) (context.Context, *grpc.
 	}
 
 	if span := trace.SpanFromContext(ctx); span.SpanContext().IsValid() {
-		unary = append(unary, filterClient(otelgrpc.UnaryClientInterceptor(otelgrpc.WithTracerProvider(span.TracerProvider()), otelgrpc.WithPropagators(propagators))))
-		stream = append(stream, otelgrpc.StreamClientInterceptor(otelgrpc.WithTracerProvider(span.TracerProvider()), otelgrpc.WithPropagators(propagators)))
+		unary = append(unary, filterClient(otelgrpc.UnaryClientInterceptor(otelgrpc.WithTracerProvider(span.TracerProvider()), otelgrpc.WithPropagators(propagators)))) //nolint:staticcheck
+		stream = append(stream, otelgrpc.StreamClientInterceptor(otelgrpc.WithTracerProvider(span.TracerProvider()), otelgrpc.WithPropagators(propagators)))            //nolint:staticcheck
 	}
 
 	unary = append(unary, grpcerrors.UnaryClientInterceptor)
