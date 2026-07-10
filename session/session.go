@@ -59,8 +59,8 @@ func NewSession(ctx context.Context, name, sharedKey string) (*Session, error) {
 	serverOpts := []grpc.ServerOption{}
 
 	if span := trace.SpanFromContext(ctx); span.SpanContext().IsValid() {
-		unary = append(unary, filterServer(otelgrpc.UnaryServerInterceptor(otelgrpc.WithTracerProvider(span.TracerProvider()), otelgrpc.WithPropagators(propagators))))
-		stream = append(stream, otelgrpc.StreamServerInterceptor(otelgrpc.WithTracerProvider(span.TracerProvider()), otelgrpc.WithPropagators(propagators)))
+		unary = append(unary, filterServer(otelgrpc.UnaryServerInterceptor(otelgrpc.WithTracerProvider(span.TracerProvider()), otelgrpc.WithPropagators(propagators)))) //nolint:staticcheck
+		stream = append(stream, otelgrpc.StreamServerInterceptor(otelgrpc.WithTracerProvider(span.TracerProvider()), otelgrpc.WithPropagators(propagators)))            //nolint:staticcheck
 	}
 
 	unary = append(unary, grpcerrors.UnaryServerInterceptor)
